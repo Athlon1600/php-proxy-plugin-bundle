@@ -8,5 +8,7 @@
 			"Proxy\\Plugin\\": "src/"
 		}
 	},
-	"require": {}
+	"require": {
+		"athlon1600/youtube-downloader": "dev-master"
+	}
 }
