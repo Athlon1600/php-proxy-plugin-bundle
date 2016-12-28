@@ -1,0 +1,12 @@
+{
+	"name": "athlon1600/php-proxy-plugin-bundle",
+	"description": "A collection of useful plugins to be used with php-proxy",
+	"type": "library",
+	"license": "MIT",
+	"autoload": {
+		"psr-4": {
+			"Proxy\\Plugin\\": ""
+		}
+	},
+	"require": {}
+}
