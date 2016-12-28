@@ -9,6 +9,6 @@
 		}
 	},
 	"require": {
-		"athlon1600/youtube-downloader": "dev-master"
+		
 	}
 }
