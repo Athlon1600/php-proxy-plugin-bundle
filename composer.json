@@ -5,7 +5,7 @@
 	"license": "MIT",
 	"autoload": {
 		"psr-4": {
-			"Proxy\\Plugin\\": ""
+			"Proxy\\Plugin\\": "src/"
 		}
 	},
 	"require": {}
