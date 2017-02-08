@@ -76,7 +76,7 @@ class VimeoPlugin extends AbstractPlugin {
 			$url = str_replace("&autoplay=1", "", trim($matches[1]));
 		}
 		
-		// Download URL that contains video info (method 3)
+		// Download URL that contains video info (method 3) ***data is JSON***
 		if(!$url)
 		{
 			if(preg_match('/XMLHttpRequest;e\.open\("GET","(.+?)"/is', $output, $matches))
@@ -91,30 +91,23 @@ class VimeoPlugin extends AbstractPlugin {
 			{
 				// Use cURL to download the URL content
 				$ch = curl_init();
-    			curl_setopt($ch, CURLOPT_URL, $url);
-    			curl_setopt($ch, CURLOPT_HEADER, 0);
-    			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    			curl_setopt($ch, CURLOPT_REFERER, $this->base_url);
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_HEADER, 0);
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_REFERER, $this->base_url);
 				curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 				curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
 				curl_setopt($ch, CURLOPT_FOLLOWLOCATION, False);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, False);
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, False);
-    			$result = curl_exec($ch);
-    			curl_close($ch);
+				$result = curl_exec($ch);
+				curl_close($ch);
 			
-			    // If we have URL content
+				// If we have URL content
 			    if($result)
 				{
 					// Extract JSON data
-					if(preg_match('/\(function\(e\,a\)\{var t=(.+?)\;if\(\!t\.request\)/is', $result, $matches))
-					{
-						$json = $matches[1];
-					}
-					else
-					{
-						$json = $result;
-					}
+					$json = preg_match('/\(function\(e\,a\)\{var t=(.+?)\;if\(\!t\.request\)/is', $result, $matches) ? $matches[1] : $result;
 					
 					// If we have JSON data
 					if($json)
@@ -122,7 +115,7 @@ class VimeoPlugin extends AbstractPlugin {
 						// Decode JSON data
 						$decoded = json_decode($json, true);
 			
-			    		// If we have video info
+						// If we have video info
 						if($decoded['request']['files']['progressive'])
 						{
 							// Set our array for video URLs
@@ -153,16 +146,16 @@ class VimeoPlugin extends AbstractPlugin {
 								// In case there is no URL of that quality, get the lowest quality
 								if(!$video_url) $video_url = $urls['360']; 
 
-			    				// Get the first video URL (lower quality) and validate it
+								// Validate the video URL
 								if(filter_var($video_url, FILTER_VALIDATE_URL))
 								{
 									// Set video URL on HTML5 player
-			    					$player = vid_player($video_url, 973, 547, 'mp4');
+									$player = vid_player($video_url, 973, 547, 'mp4');
 
 									// Replace original player container with our player
 									
 									// When on channels, i.e https://vimeo.com/channels/1341
-			    					$output = Html::replace_inner(".channel_clip_container", $player, $output);
+									$output = Html::replace_inner(".channel_clip_container", $player, $output);
 									
 									// When on single video, i.e https://vimeo.com/202629825
 									$output = Html::replace_inner(".app_banner_container", $player, $output);
