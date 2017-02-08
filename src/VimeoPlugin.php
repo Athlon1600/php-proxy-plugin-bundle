@@ -45,6 +45,10 @@ class VimeoPlugin extends AbstractPlugin {
 		$matches[0] = preg_replace_callback('/"thumbnail_4x":"(.*?)"/', array($this, 'json_src'), $matches[0]);
 		$matches[0] = preg_replace_callback('/"thumbnail_8x":"(.*?)"/', array($this, 'json_src'), $matches[0]);
 		$matches[0] = preg_replace_callback('/"link":"(.+?)"/', array($this, 'json_src'), $matches[0]);
+		$matches[0] = preg_replace_callback('/"background_image_url":"(.+?)"/', array($this, 'json_src'), $matches[0]);
+		$matches[0] = preg_replace_callback('/"background_image_url_2x":"(.+?)"/', array($this, 'json_src'), $matches[0]);
+		$matches[0] = preg_replace_callback('/"portrait":"(.+?)"/', array($this, 'json_src'), $matches[0]);
+		$matches[0] = preg_replace_callback('/"portrait_bg":"(.+?)"/', array($this, 'json_src'), $matches[0]);
 		
 		//Set autoplay to false else it appends &autoplay=1 to proxified URLs
 		$matches[0] = str_replace(',"autoplay":true', ',"autoplay":false', $matches[0]);
