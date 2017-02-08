@@ -22,6 +22,9 @@ class VimeoPlugin extends AbstractPlugin {
 		// Do not proxify already proxified URLs
 		if(stripos($url, app_url()) === 0) return $matches[0];
 
+		// Remove ?autoplay=1
+		$url = str_replace('?autoplay=1', '', $url);
+		
 		// Proxify URL => JSON_Encode => Remove "
 		$url_proxied = str_replace("\"", "", json_encode(proxify_url($url, $this->base_url)));
 		
@@ -41,6 +44,7 @@ class VimeoPlugin extends AbstractPlugin {
 		$matches[0] = preg_replace_callback('/"thumbnail_2x":"(.*?)"/', array($this, 'json_src'), $matches[0]);
 		$matches[0] = preg_replace_callback('/"thumbnail_4x":"(.*?)"/', array($this, 'json_src'), $matches[0]);
 		$matches[0] = preg_replace_callback('/"thumbnail_8x":"(.*?)"/', array($this, 'json_src'), $matches[0]);
+		$matches[0] = preg_replace_callback('/"link":"(.+?)"/', array($this, 'json_src'), $matches[0]);
 		
 		//Set autoplay to false else it appends &autoplay=1 to proxified URLs
 		$matches[0] = str_replace(',"autoplay":true', ',"autoplay":false', $matches[0]);
@@ -66,14 +70,14 @@ class VimeoPlugin extends AbstractPlugin {
 		// Download URL that contains video info (method 1)
 		if(preg_match('/\<meta property\=\"og\:video\:url\" content\=\"(.+?)\"\>/is', $output, $matches))
 		{
-			$url = str_replace("&autoplay=1", "", trim($matches[1]));
+			$url = str_replace('?autoplay=1', '', trim($matches[1]));
 		}
 		
 		// Download URL that contains video info (method 2)
 		if(!$url)
 		{
 		    if(preg_match('/\<meta name\=\"twitter:player\" content\=\"(.+?)\"\>/is', $output, $matches))
-			$url = str_replace("&autoplay=1", "", trim($matches[1]));
+			$url = str_replace('?autoplay=1', '', trim($matches[1]));
 		}
 		
 		// Download URL that contains video info (method 3) ***data is JSON***
@@ -94,6 +98,7 @@ class VimeoPlugin extends AbstractPlugin {
 				curl_setopt($ch, CURLOPT_URL, $url);
 				curl_setopt($ch, CURLOPT_HEADER, 0);
 				curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+				curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:50.0) Gecko/20100101 Firefox/50.0');
 				curl_setopt($ch, CURLOPT_REFERER, $this->base_url);
 				curl_setopt($ch, CURLOPT_TIMEOUT, 5);
 				curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
@@ -102,19 +107,19 @@ class VimeoPlugin extends AbstractPlugin {
 				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, False);
 				$result = curl_exec($ch);
 				curl_close($ch);
-			
+				
 				// If we have URL content
 			    if($result)
 				{
 					// Extract JSON data
 					$json = preg_match('/\(function\(e\,a\)\{var t=(.+?)\;if\(\!t\.request\)/is', $result, $matches) ? $matches[1] : $result;
-					
+
 					// If we have JSON data
 					if($json)
 					{
 						// Decode JSON data
 						$decoded = json_decode($json, true);
-			
+						
 						// If we have video info
 						if($decoded['request']['files']['progressive'])
 						{
@@ -145,7 +150,7 @@ class VimeoPlugin extends AbstractPlugin {
 
 								// In case there is no URL of that quality, get the lowest quality
 								if(!$video_url) $video_url = $urls['360']; 
-
+								
 								// Validate the video URL
 								if(filter_var($video_url, FILTER_VALIDATE_URL))
 								{
@@ -153,11 +158,6 @@ class VimeoPlugin extends AbstractPlugin {
 									$player = vid_player($video_url, 973, 547, 'mp4');
 
 									// Replace original player container with our player
-									
-									// When on channels, i.e https://vimeo.com/channels/1341
-									$output = Html::replace_inner(".channel_clip_container", $player, $output);
-									
-									// When on single video, i.e https://vimeo.com/202629825
 									$output = Html::replace_inner(".app_banner_container", $player, $output);
 								}
 							}
