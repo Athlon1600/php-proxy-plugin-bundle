@@ -33,6 +33,8 @@ class RedTubePlugin extends AbstractPlugin {
 		
 			$video = rawurldecode(stripslashes($matches[0][2]));
 			
+			$video = (preg_match('/^\/\//is', $video)) ? "http:".$video : $video;
+			
 			// generate player
 			$player = vid_player($video, 973, 547, 'mp4');
 			
