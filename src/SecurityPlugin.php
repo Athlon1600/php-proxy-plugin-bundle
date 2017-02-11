@@ -49,8 +49,17 @@ class SecurityPlugin extends AbstractPlugin {
 			$this->ErrorMsg("URL is not valid");
 		}
 		
+		// Do not proxify invalid URLs like http://file://aaa
+		if(preg_match('/.*:.*:/is', $url)){
+			$this->ErrorMsg("URL is not valid");
+		}
+		
+		// Do not proxify URLs that contain pattern of hidden folders or files
+		if(preg_match('/(\/\.|\.\.)/is', $url)){
+			$this->ErrorMsg("URL is not valid");
+		}
+		
 		// Do not proxify invalid scheme
-		// *** May not be needed because the php-proxy already adds http:// by default ***
 		if(!in_array(strtolower(parse_url($url, PHP_URL_SCHEME)), array("http","https","ftp"))){
 			$this->ErrorMsg("Scheme is not allowed");
 		}
