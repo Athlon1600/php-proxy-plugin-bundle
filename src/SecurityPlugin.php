@@ -49,11 +49,6 @@ class SecurityPlugin extends AbstractPlugin {
 			$this->ErrorMsg("URL is not valid");
 		}
 		
-		// Do not proxify invalid URLs like http://file://aaa
-		if(preg_match('/.*:.*:/is', $url)){
-			$this->ErrorMsg("URL is not valid");
-		}
-		
 		// Do not proxify URLs that contain pattern of hidden folders or files
 		if(preg_match('/(\/\.|\.\.)/is', $url)){
 			$this->ErrorMsg("URL is not valid");
