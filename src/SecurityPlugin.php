@@ -43,13 +43,16 @@ class SecurityPlugin extends AbstractPlugin {
 
 		// Get URL
 		$url = $event['request']->getUri();
+		
+		// Trim URL (important to validate URL)
+		$url = trim($url);
         
 		// Do not proxify invalid URLs
 		if(!filter_var($url, FILTER_VALIDATE_URL)){
 			$this->ErrorMsg("URL is not valid");
 		}
 		
-		// Do not proxify URLs that contain pattern of hidden folders or files
+		// Do not proxify URLs that contain pattern of hidden folders or files (i.e /.htpasswd)
 		if(preg_match('/(\/\.|\.\.)/is', $url)){
 			$this->ErrorMsg("URL is not valid");
 		}
