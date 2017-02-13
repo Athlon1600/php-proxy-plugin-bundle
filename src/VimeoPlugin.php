@@ -135,7 +135,7 @@ class VimeoPlugin extends AbstractPlugin {
 							{
 								if($video['url'])
 								{
-									// Remove the "p" so we can ksort() the array
+									// Remove the "p" so we get video quality as numbers (i.e 270, 360, etc)
 									$urls[str_replace("p", "", $video['quality'])] = rawurldecode(stripslashes(trim($video['url'])));
 								}
 							}
@@ -143,18 +143,15 @@ class VimeoPlugin extends AbstractPlugin {
 							// If we have at least one URL
 							if(count($urls)>0)
 							{
-								// Sort array based on quality (lower to high)
-								ksort($urls);
-
-								// First try to set preferred video quality URL
-								$video_url = $urls['540'] ? $urls['540'] : $urls['720'];
+								// First try to set preferred (low) video quality URL
+								$video_url = $urls['270'] ? $urls['270'] : $urls['360'];
 							
-								// In case there is no URL of that quality, get the HD quality
+								// In case there is no URL of that quality, try to get better quality
+								if(!$video_url) $video_url = $urls['540'] ? $urls['540'] : $urls['720'];
+
+								// In case there is no URL of that quality, try to get HD quality
 								if(!$video_url) $video_url = $urls['1080']; 
 
-								// In case there is no URL of that quality, get the lowest quality
-								if(!$video_url) $video_url = $urls['360']; 
-								
 								// Validate the video URL
 								if(filter_var($video_url, FILTER_VALIDATE_URL))
 								{
