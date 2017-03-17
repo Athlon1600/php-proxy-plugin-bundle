@@ -4,7 +4,6 @@ namespace Proxy\Plugin;
 
 use Proxy\Plugin\AbstractPlugin;
 use Proxy\Event\ProxyEvent;
-
 use Proxy\Html;
 
 class XHamsterPlugin extends AbstractPlugin {
@@ -35,18 +34,17 @@ class XHamsterPlugin extends AbstractPlugin {
 		
 		// remove ts_popunder stuff
 		$content = preg_replace('/<script[^>]*no-popunder[^>]*><\/script>/m', '', $content);
-		
 		$content = preg_replace_callback('/<img[^>]*sprite=\'(.*?)\'/im', array($this, 'img_sprite'), $content);
 		
 		// are we on a video page?
 		$file = $this->find_video($content);
 		
 		if($file){
-		
 			$player = vid_player($file, 638, 504);
-			
 			$content = Html::replace_inner("#playerSwf", $player, $content);
 		}
+		
+		$content = Html::remove_scripts($content);
 		
 		$response->setContent($content);
 	}
