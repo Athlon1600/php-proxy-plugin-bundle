@@ -11,6 +11,12 @@ class YoutubePlugin extends AbstractPlugin {
 
 	protected $url_pattern = 'youtube.com';
 	
+	// force old YouTube layout!
+	public function onBeforeRequest(ProxyEvent $event){
+		$event['request']->headers->set('Cookie', 'PREF=f6=8');
+		$event['request']->headers->set('User-Agent', 'Opera/7.50 (Windows XP; U)');
+	}
+	
 	public function onCompleted(ProxyEvent $event){
 	
 		$response = $event['response'];
