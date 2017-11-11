@@ -10,38 +10,42 @@ class XHamsterPlugin extends AbstractPlugin {
 
 	protected $url_pattern = 'xhamster.com';
 	
+	public function onBeforeRequest(ProxyEvent $event){
+		// mobile
+		$event['request']->headers->set('user-agent', 'Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30');
+	}
+	
 	private function find_video($html){
-
 		$file = false;
 		
-		if(preg_match("/file: '([^']+)'/", $html, $matches)){
+		if(preg_match('/"play":"([^"]+)"/', $html, $matches)){
 			$file = rawurldecode($matches[1]);
-		} else if(preg_match("@srv=&file=([^&]+)@s", $html, $matches)){
-			$file = rawurldecode($matches[1]);
+			$file = str_replace('\\', '', $file);
 		}
 		
 		return $file;
 	}
 	
-	private function img_sprite($matches){
-		return str_replace($matches[1], proxify_url($matches[1], $matches[1]), $matches[0]);
-	}
-
 	public function onCompleted(ProxyEvent $event){
-	
 		$response = $event['response'];
 		$content = $response->getContent();
 		
-		// remove ts_popunder stuff
-		$content = preg_replace('/<script[^>]*no-popunder[^>]*><\/script>/m', '', $content);
-		$content = preg_replace_callback('/<img[^>]*sprite=\'(.*?)\'/im', array($this, 'img_sprite'), $content);
+		// remove ads
+		$content = HTML::remove('.ts', $content);
 		
-		// are we on a video page?
+		// is this video page?
 		$file = $this->find_video($content);
-		
 		if($file){
 			$player = vid_player($file, 638, 504);
-			$content = Html::replace_inner("#playerSwf", $player, $content);
+			$player = str_replace('<video', '<video style="display:block;', $player);
+			
+			$content = HTML::replace_inner('#video_box', $player, $content);
+			
+			// remove "show comments" button
+			$content = HTML::remove('#commentToggle', $content);
+			
+			// display all comments by default
+			$content = str_replace('<div class="comments_block"', '<div style="display:block;" class="comments_block"', $content);
 		}
 		
 		$content = Html::remove_scripts($content);
