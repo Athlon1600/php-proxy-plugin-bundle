@@ -36,7 +36,7 @@ class YoutubePlugin extends AbstractPlugin {
 			$has_src = strpos($matches[0], 'src="') !== false;
 			
 			// proxified thumb url
-			$thumb_url = $matches[1]; //proxify_url($matches[1], false);
+			$thumb_url = proxify_url($matches[1], false);
 			
 			if($has_src){
 				// TODO: maybe remove data-thumb too?
