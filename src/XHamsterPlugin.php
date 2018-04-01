@@ -11,16 +11,16 @@ class XHamsterPlugin extends AbstractPlugin {
 	protected $url_pattern = 'xhamster.com';
 	
 	public function onBeforeRequest(ProxyEvent $event){
-		// mobile
-		$event['request']->headers->set('user-agent', 'Mozilla/5.0 (Linux; U; Android 4.0.3; de-ch; HTC Sensation Build/IML74K) AppleWebKit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30');
+		// we do not want to force mobile this time
+		$event['request']->headers->set('user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:59.0) Gecko/20100101 Firefox/59.0');
 	}
 	
 	private function find_video($html){
 		$file = false;
 		
-		if(preg_match('/"play":"([^"]+)"/', $html, $matches)){
-			$file = rawurldecode($matches[1]);
-			$file = str_replace('\\', '', $file);
+		if(preg_match('/mp4File":"([^"]+)/', $html, $matches)){
+			$file = $matches[1];
+			return stripslashes($file);
 		}
 		
 		return $file;
@@ -36,10 +36,11 @@ class XHamsterPlugin extends AbstractPlugin {
 		// is this video page?
 		$file = $this->find_video($content);
 		if($file){
-			$player = vid_player($file, 638, 504);
+			$player = vid_player($file, 950, 650);
 			$player = str_replace('<video', '<video style="display:block;', $player);
 			
-			$content = HTML::replace_inner('#video_box', $player, $content);
+			//$content = HTML::replace_inner('#video_box', $player, $content);
+			$content = HTML::replace_inner('#player-container', $player, $content);
 			
 			// remove "show comments" button
 			$content = HTML::remove('#commentToggle', $content);
