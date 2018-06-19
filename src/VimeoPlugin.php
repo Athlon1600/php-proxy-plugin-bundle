@@ -136,7 +136,8 @@ class VimeoPlugin extends AbstractPlugin {
 								if($video['url'])
 								{
 									// Remove the "p" so we get video quality as numbers (i.e 270, 360, etc)
-									$urls[str_replace("p", "", $video['quality'])] = rawurldecode(stripslashes(trim($video['url'])));
+									//$urls[str_replace("p", "", $video['quality'])] = rawurldecode(stripslashes(trim($video['url'])));
+									$urls[str_replace("p", "", $video['quality'])] = stripslashes(trim($video['url']));
 								}
 							}
 						
