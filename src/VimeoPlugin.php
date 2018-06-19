@@ -87,7 +87,7 @@ class VimeoPlugin extends AbstractPlugin {
 		// Download URL that contains video info (method 3) ***data is JSON***
 		if(!$url)
 		{
-			if(preg_match('/XMLHttpRequest;e\.open\("GET","(.+?)"/is', $output, $matches))
+			if(preg_match('/xhr\.open\(["\']GET["\'],\s*["\'](.+?)["\']/is', $output, $matches))
 			$url = trim($matches[1]);
 		}
 
@@ -116,7 +116,7 @@ class VimeoPlugin extends AbstractPlugin {
 			    if($result)
 				{
 					// Extract JSON data
-					$json = preg_match('/\(function\(e\,a\)\{var t=(.+?)\;if\(\!t\.request\)/is', $result, $matches) ? $matches[1] : $result;
+					$json = preg_match('/\(function\(\w+\,\w+\)\{var \w+=(.+?)\;if\(\!\w+\.request\)/is', $result, $matches) ? $matches[1] : $result;
 
 					// If we have JSON data
 					if($json)
@@ -144,10 +144,10 @@ class VimeoPlugin extends AbstractPlugin {
 							if(count($urls)>0)
 							{
 								// First try to set preferred (low) video quality URL
-								$video_url = $urls['270'] ? $urls['270'] : $urls['360'];
+								$video_url = isset($urls['270']) ? $urls['270'] : $urls['360'];
 							
 								// In case there is no URL of that quality, try to get better quality
-								if(!$video_url) $video_url = $urls['540'] ? $urls['540'] : $urls['720'];
+								if(!$video_url) $video_url = isset($urls['540']) ? $urls['540'] : $urls['720'];
 
 								// In case there is no URL of that quality, try to get HD quality
 								if(!$video_url) $video_url = $urls['1080']; 
@@ -159,7 +159,7 @@ class VimeoPlugin extends AbstractPlugin {
 									$player = vid_player($video_url, 973, 547, 'mp4');
 
 									// Replace original player container with our player
-									$output = Html::replace_inner(".app_banner_container", $player, $output);
+									$output = Html::replace_inner(".player_area", $player, $output);
 								}
 							}
 						}
