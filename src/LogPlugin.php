@@ -2,13 +2,15 @@
 
 use Proxy\Plugin\AbstractPlugin;
 use Proxy\Event\ProxyEvent;
+use Proxy\Config;
 
 class LogPlugin extends AbstractPlugin {
 
 	public function onHeadersReceived(ProxyEvent $event){
 	
-		// because this will be included in index.php - php-proxy-app/storage
-		$storage_dir = realpath('./storage');
+		// to use a custom logs folder set it on main config.php with $config['custom_logs_folder'] = '/var/logs';
+		// else it will use default /storage/ folder, because this will be included in index.php -> php-proxy-app/storage
+		$storage_dir = Config::get('custom_logs_folder') ? Config::get('custom_logs_folder') : realpath('./storage');
 		
 		if(!is_writable($storage_dir)){
 			return;
