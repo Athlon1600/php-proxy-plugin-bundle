@@ -8,7 +8,7 @@ class AdBlockPlugin extends AbstractPlugin {
 	public function onBeforeRequest(ProxyEvent $event){
 		$request = $event['request'];
 		// load adblock serverlist
-		$ab_file = @file_get_contents('serverlist.txt');
+		$ab_file = file_get_contents(__DIR__.DIRECTORY_SEPARATOR.'serverlist.txt');
 		// do nothing if loading fails
 		if ($ab_file===false){
 			return;
