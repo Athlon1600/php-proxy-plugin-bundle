@@ -55,7 +55,7 @@ class YoutubePlugin extends AbstractPlugin {
 		
 			$url = current($links)['url'];
 			
-			$player = vid_player($url, 640, 390, 'mp4');
+			$player = vid_player($url, '100%', '100%', 'mp4');
 			
 			// this div blocks our player controls
 			$output = Html::remove("#theater-background", $output);
