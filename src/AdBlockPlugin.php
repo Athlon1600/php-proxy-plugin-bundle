@@ -23,8 +23,8 @@ class AdBlockPlugin extends AbstractPlugin {
 		$request_hostname = parse_url($request_url, PHP_URL_HOST);
 		// check if hostname is blacklisted
 		if (in_array($request_hostname, $ab_hostnames)) {
-			// null route it.
-			$request->setUrl("http://0.0.0.0/null.routed");
+			//$request->setUrl("http://0.0.0.0/null.routed");
+			throw new \Exception("Host is not allowed");
 		}
 	}
 }
