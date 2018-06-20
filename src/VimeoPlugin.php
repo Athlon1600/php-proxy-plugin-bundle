@@ -70,6 +70,11 @@ class VimeoPlugin extends AbstractPlugin {
 		return $matches[0];
 	}
 	
+	// determine if the passed argument can be treated like a string.
+	private function is_stringy($text) {
+		return (is_string($text) || (is_object($text) && method_exists($text, '__toString' )));
+	}
+
 	public function onCompleted(ProxyEvent $event){
 		$request = $event['request'];
 		// get request url
@@ -190,13 +195,22 @@ class VimeoPlugin extends AbstractPlugin {
 			}
 		}
 		
+		// fix header
+		$css='<style type="text/css">.outer_wrap { padding-top: 45px; } .topnav_sticky { top: 45px; }</style>';
+		$topnav = Html::extract_inner("#topnav_outer_wrap", $output);
+		if (isset($topnav[0]) && $this->is_stringy($topnav[0])){
+			$topnav=$css.$topnav[0];
+			$output = Html::replace_inner("#topnav_outer_wrap", $topnav, $output);
+		}
 		// Show video info
 		$clip_main = Html::extract_inner(".clip_main", $output);
-		$clip_main = preg_replace('%</?noscript>%m', '', $clip_main);
-		$output = Html::replace_inner(".clip_main", $clip_main, $output);
-		// Selector support of Html::find is not good. We have to use illegal selector.
-		// USE phpQuery or QueryPath in the future?
-		$output = Html::replace_outer(".row u-collapse clip-notification", "", $output);
+		if (isset($clip_main[0]) && $this->is_stringy($clip_main[0])){
+			$clip_main = preg_replace('%</?noscript>%m', '', $clip_main[0]);
+			$output = Html::replace_inner(".clip_main", $clip_main, $output);
+			// Selector support of Html::find is not good. We have to use illegal selector.
+			// USE phpQuery or QueryPath in the future?
+			$output = Html::replace_outer(".row u-collapse clip-notification", "", $output);
+		}
 		$event['response']->setContent($output);
 	}
 }
