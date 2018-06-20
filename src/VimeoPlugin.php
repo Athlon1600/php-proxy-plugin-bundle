@@ -190,6 +190,13 @@ class VimeoPlugin extends AbstractPlugin {
 			}
 		}
 		
+		// Show video info
+		$clip_main = Html::extract_inner(".clip_main", $output);
+		$clip_main = preg_replace('%</?noscript>%m', '', $clip_main);
+		$output = Html::replace_inner(".clip_main", $clip_main, $output);
+		// Selector support of Html::find is not good. We have to use illegal selector.
+		// USE phpQuery or QueryPath in the future?
+		$output = Html::replace_outer(".row u-collapse clip-notification", "", $output);
 		$event['response']->setContent($output);
 	}
 }
