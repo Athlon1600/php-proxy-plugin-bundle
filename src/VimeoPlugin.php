@@ -9,8 +9,20 @@ use Proxy\Html;
 
 class VimeoPlugin extends AbstractPlugin {
 
-	protected $url_pattern = 'vimeo.com';
+	protected $url_pattern = '/^(vimeo\.com|gcs-vimeo\.akamaized\.net)$/i';
 	
+	public function onBeforeRequest(ProxyEvent $event){
+		$request = $event['request'];
+		// get request url
+		$request_url = $request->getUri();
+		// get request hostname
+		$request_hostname = parse_url($request_url, PHP_URL_HOST);
+		if ($request_hostname ==='gcs-vimeo.akamaized.net') {
+			// if it is akamai, clear cookies
+			$event['request']->headers->remove('Cookie');
+		}
+	}
+
 	private function json_src($matches){
 		
 		// Ignore empty\bad "url":"", or "src":"", 
@@ -59,6 +71,15 @@ class VimeoPlugin extends AbstractPlugin {
 	}
 	
 	public function onCompleted(ProxyEvent $event){
+		$request = $event['request'];
+		// get request url
+		$request_url = $request->getUri();
+		// get request hostname
+		$request_hostname = parse_url($request_url, PHP_URL_HOST);
+		// if it is akamai, do nothing
+		if ($request_hostname ==='gcs-vimeo.akamaized.net') {
+			return;
+		}
 	
 	    // Set HTML content
 		$output = $event['response']->getContent();
