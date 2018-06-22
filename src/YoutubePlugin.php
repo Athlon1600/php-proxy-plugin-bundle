@@ -62,6 +62,12 @@ class YoutubePlugin extends AbstractPlugin {
 			
 			// replace youtube player div block with our own
 			$output = Html::replace_inner("#player-api", $player, $output);
+			
+			// these block our player
+			$output = Html::remove("#error-screen", $output);
+			$output = Html::remove("#player-unavailable", $output);
+			$output = Html::remove("#verify", $output);
+			$output = preg_replace('/(<div[^>]+id="player"[^>]+)(off-screen-trigger)([^>]+>)/m', '$1$3', $output);
 		}
 		
 		// causes too many problems...
