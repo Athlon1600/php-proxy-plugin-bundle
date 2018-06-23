@@ -196,12 +196,13 @@ class VimeoPlugin extends AbstractPlugin {
 		}
 		
 		// fix header
-		$css='<style type="text/css">.outer_wrap { padding-top: 45px; } .topnav_sticky { top: 45px; }</style>';
+		$css='<style type="text/css">.wrap_content { padding-top: unset !important; }</style>';
 		$topnav = Html::extract_inner("#topnav_outer_wrap", $output);
 		if (isset($topnav[0]) && $this->is_stringy($topnav[0])){
 			$topnav=$css.$topnav[0];
 			$output = Html::replace_inner("#topnav_outer_wrap", $topnav, $output);
 		}
+
 		// Show video info
 		$clip_main = Html::extract_inner(".clip_main", $output);
 		if (isset($clip_main[0]) && $this->is_stringy($clip_main[0])){
