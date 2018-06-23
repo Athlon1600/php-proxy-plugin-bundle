@@ -55,13 +55,19 @@ class YoutubePlugin extends AbstractPlugin {
 		
 			$url = current($links)['url'];
 			
-			$player = vid_player($url, 640, 390, 'mp4');
+			$player = vid_player($url, '100%', '100%', 'mp4');
 			
 			// this div blocks our player controls
 			$output = Html::remove("#theater-background", $output);
 			
 			// replace youtube player div block with our own
 			$output = Html::replace_inner("#player-api", $player, $output);
+			
+			// these block our player
+			$output = Html::remove("#error-screen", $output);
+			$output = Html::remove("#player-unavailable", $output);
+			$output = Html::remove("#verify", $output);
+			$output = preg_replace('/(<div[^>]+id="player"[^>]+)(off-screen-trigger)([^>]+>)/m', '$1$3', $output);
 		}
 		
 		// causes too many problems...
