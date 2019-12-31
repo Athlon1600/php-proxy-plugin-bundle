@@ -12,6 +12,7 @@
 		]
 	},
 	"require": {
-		"athlon1600/youtube-downloader": "^1.0"
+		"athlon1600/php-proxy": "^5.0",
+		"athlon1600/youtube-downloader": "^2.0"
 	}
 }
