@@ -13,8 +13,8 @@ class YoutubePlugin extends AbstractPlugin
     // force old YouTube layout!
     public function onBeforeRequest(ProxyEvent $event)
     {
-        $event['request']->headers->set('Cookie', 'PREF=f6=8');
-        $event['request']->headers->set('User-Agent', 'Opera/7.50 (Windows XP; U)');
+        //$event['request']->headers->set('Cookie', 'PREF=f6=8');
+        $event['request']->headers->set('User-Agent', 'Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)');
     }
 
     public function onCompleted(ProxyEvent $event)
@@ -22,6 +22,12 @@ class YoutubePlugin extends AbstractPlugin
         $response = $event['response'];
         $url = $event['request']->getUrl();
         $output = $response->getContent();
+
+        // homepage will never work properly. Redirect to trending instead.
+        if (!preg_match('/(watch|results|feed|channel|ombed|css)/i', $url)) {
+            $response->headers->set('location', proxify_url("https://www.youtube.com/feed/trending", $url));
+            return;
+        }
 
         // remove top banner that's full of ads
         $output = Html::remove("#header", $output);
